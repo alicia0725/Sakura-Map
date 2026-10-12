@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sakura & Momiji Map 日本花況與紅葉地圖</title>
+  <meta name="description" content="全日本即時櫻花與紅葉花況地圖，整合即時氣象預報與景點查詢。">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Noto Sans JP, Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom Style -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="theme-momiji">
+
+  <!-- 頂部簡約導航列 -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon" id="brand-season-icon">🍁</span>
+      <div class="brand-text">
+        <h1 id="app-main-title">日本即時紅葉地圖</h1>
+        <p class="brand-subtitle" id="app-sub-title">Momiji & Sakura Live Map</p>
+      </div>
+    </div>
+
+    <!-- 季節雙模式切換 (春季賞櫻 / 秋季賞楓) -->
+    <div class="season-switcher">
+      <button class="season-btn active" id="btn-season-momiji" data-season="momiji">
+        <span>🍁 秋季賞楓</span>
+      </button>
+      <button class="season-btn" id="btn-season-sakura" data-season="sakura">
+        <span>🌸 春季賞櫻</span>
+      </button>
+    </div>
+
+    <!-- 右側工具群 (日本標準時間 + AI 實景辨識) -->
+    <div class="nav-tools">
+      <div class="clock-badge" id="jst-clock" title="日本標準時間 (JST)">--:--:-- JST</div>
+      <button class="btn btn-sm btn-ghost" id="open-ai-modal-btn">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> AI 實景辨識
+      </button>
+    </div>
+  </header>
+
+  <!-- 主佈局容器 -->
+  <main class="app-layout">
+
+    <!-- 左側景點控制面板 -->
+    <aside class="sidebar" id="sidebar">
+      <!-- 搜尋列 -->
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="search-input" placeholder="搜尋景點、城市、樹種或關鍵字..." autocomplete="off">
+        <button id="clear-search" class="clear-btn" style="display: none;">&times;</button>
+      </div>
+
+      <!-- 地區篩選按鈕群 -->
+      <div class="filter-group">
+        <div class="filter-header">
+          <span><i class="fa-solid fa-map-location-dot"></i> 地區篩選</span>
+          <button class="reset-link" id="reset-filters-btn">重設條件</button>
+        </div>
+        <div class="region-pills" id="region-pills">
+          <button class="pill active" data-region="all">全日本</button>
+          <button class="pill" data-region="hokkaido">北海道</button>
+          <button class="pill" data-region="tohoku">東北</button>
+          <button class="pill" data-region="kanto">關東</button>
+          <button class="pill" data-region="chubu">中部</button>
+          <button class="pill" data-region="kansai">關西</button>
+          <button class="pill" data-region="chugoku">中國</button>
+          <button class="pill" data-region="shikoku">四國</button>
+          <button class="pill" data-region="kyushu">九州</button>
+        </div>
+      </div>
+
+      <!-- 狀態篩選標籤 -->
+      <div class="filter-group">
+        <div class="filter-header">
+          <span id="status-filter-title"><i class="fa-solid fa-seedling"></i> 進度篩選</span>
+        </div>
+        <div class="status-filters" id="status-filters">
+          <button class="status-btn active" data-status="all">全部</button>
+          <button class="status-btn" data-status="full_bloom" id="st-btn-full">
+            <span class="color-dot dot-full"></span><span class="st-name">見頃</span>
+          </button>
+          <button class="status-btn" data-status="half_bloom" id="st-btn-half">
+            <span class="color-dot dot-half"></span><span class="st-name">佳期近</span>
+          </button>
+          <button class="status-btn" data-status="early_bloom" id="st-btn-early">
+            <span class="color-dot dot-early"></span><span class="st-name">初變色</span>
+          </button>
+          <button class="status-btn" data-status="budding" id="st-btn-bud">
+            <span class="color-dot dot-bud"></span><span class="st-name">青葉</span>
+          </button>
+          <button class="status-btn" data-status="petal_fall" id="st-btn-fall">
+            <span class="color-dot dot-fall"></span><span class="st-name">落葉</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 景點列表 -->
+      <div class="spots-list-wrapper">
+        <div class="list-meta">
+          <span id="results-count">找到 <strong>0</strong> 個景點</span>
+          <span class="list-hint">點選卡片可定位並查看天氣</span>
+        </div>
+        <div class="spots-list" id="spots-list">
+          <!-- 動態載入景點卡片 -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- 地圖主畫布 -->
+    <section class="map-container">
+      <!-- 頂部情境說明橫條 -->
+      <div class="season-notice-bar" id="season-notice-bar">
+        <i class="fa-solid fa-circle-info"></i>
+        <span id="season-notice-text">
+          🍁 <strong>當前時令（9月下旬）：</strong>北海道大雪山已迎來全日本最早「見頃滿紅」；平地櫻樹目前皆為夏秋綠葉。
+        </span>
+      </div>
+
+      <!-- 地圖容器 -->
+      <div id="map"></div>
+
+      <!-- 快速視角選擇器 (放置於右下角，避免遮蔽) -->
+      <div class="map-quick-views">
+        <button class="view-btn" data-lat="36.5" data-lng="137.5" data-zoom="6">全景</button>
+        <button class="view-btn" data-lat="35.6895" data-lng="139.72" data-zoom="11">東京</button>
+        <button class="view-btn" data-lat="35.0" data-lng="135.75" data-zoom="11">京都</button>
+        <button class="view-btn" data-lat="39.5" data-lng="140.8" data-zoom="7.5">東北</button>
+        <button class="view-btn" data-lat="43.0" data-lng="142.5" data-zoom="7">北海道</button>
+        <button class="view-btn" data-lat="33.5" data-lng="130.6" data-zoom="8">九州</button>
+      </div>
+
+      <!-- 地圖圖例 -->
+      <div class="map-legend" id="map-legend">
+        <div class="legend-title" id="legend-title">🍁 紅葉進度標示</div>
+        <div class="legend-items">
+          <div class="legend-item"><span class="legend-dot dot-full"></span> <span id="leg-full">見頃 (滿紅 70~100%)</span></div>
+          <div class="legend-item"><span class="legend-dot dot-half"></span> <span id="leg-half">見頃間近 (50~70%)</span></div>
+          <div class="legend-item"><span class="legend-dot dot-early"></span> <span id="leg-early">色づき始め (20~50%)</span></div>
+          <div class="legend-item"><span class="legend-dot dot-bud"></span> <span id="leg-bud">青葉 (綠葉 0~20%)</span></div>
+          <div class="legend-item"><span class="legend-dot dot-fall"></span> <span id="leg-fall">落葉</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 景點詳情抽屜 (點擊景點滑出，點空白處收合) -->
+    <div class="spot-drawer" id="spot-drawer">
+      <button class="close-drawer-btn" id="close-drawer-btn" title="收合抽屜">&times;</button>
+      
+      <div class="drawer-cover">
+        <img id="drawer-img" src="" alt="景點相片">
+        <div class="drawer-cover-badge" id="drawer-status-badge">見頃</div>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-heading">
+          <h2 id="drawer-name">景點名稱</h2>
+          <div class="drawer-subnames" id="drawer-names-alt">
+            <span id="drawer-name-ja">--</span> • <span id="drawer-name-en">--</span>
+          </div>
+          <div class="drawer-address">
+            <i class="fa-solid fa-location-dot"></i> <span id="drawer-address-text">--</span>
+          </div>
+        </div>
+
+        <!-- 進度指示 -->
+        <div class="drawer-progress-box">
+          <div class="dp-header">
+            <span id="dp-label"><i class="fa-solid fa-chart-simple"></i> 進度成熟度</span>
+            <strong id="drawer-bloom-pct">100%</strong>
+          </div>
+          <div class="dp-bar">
+            <div class="dp-fill" id="drawer-bloom-fill"></div>
+          </div>
+          <div class="dp-period">
+            <i class="fa-regular fa-calendar-check"></i> 最佳觀賞期：<strong id="drawer-best-period">--</strong>
+          </div>
+        </div>
+
+        <!-- 規格標籤 -->
+        <div class="drawer-specs">
+          <div class="spec-cell">
+            <small>主要品種</small>
+            <p id="drawer-types">--</p>
+          </div>
+          <div class="spec-cell">
+            <small id="drawer-tree-scale-label">景觀規模</small>
+            <p id="drawer-tree-count">--</p>
+          </div>
+        </div>
+
+        <!-- JMA / Open-Meteo 即時微氣候面板 -->
+        <div class="weather-panel">
+          <div class="wp-header">
+            <div class="wp-title">
+              <span class="live-indicator"></span>
+              <span>現地即時氣象 (JMA 測站網格)</span>
+            </div>
+            <div class="wp-actions">
+              <span class="wp-live-badge"><i class="fa-solid fa-bolt"></i> 實時直連</span>
+              <button class="btn-refresh" id="refresh-weather-btn" title="重新抓取最新即時天氣">
+                <i class="fa-solid fa-rotate"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="wp-coords">
+            <span id="weather-coords"><i class="fa-solid fa-crosshairs"></i> 測站坐標：--</span>
+            <span id="weather-timestamp"><i class="fa-regular fa-clock"></i> 觀測時間：--</span>
+          </div>
+
+          <div class="wp-main">
+            <div class="wp-temp">
+              <span class="temp-num" id="weather-temp">--</span><span class="temp-deg">°C</span>
+            </div>
+            <div class="wp-info">
+              <div class="wp-cond" id="weather-condition">即時連線中...</div>
+              <div class="wp-metrics">
+                <span>體感 <strong id="weather-apparent">--°C</strong></span>
+                <span>濕度 <strong id="weather-humidity">--%</strong></span>
+                <span>風況 <strong id="weather-wind">-- m/s</strong></span>
+              </div>
+              <div class="wp-sub-metrics">
+                <span>降雨機率 <strong id="weather-rain-prob">--%</strong></span>
+                <span>紫外線 <strong id="weather-uv">--</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 賞花/賞楓適宜度指數 -->
+          <div class="hanami-index-card">
+            <div class="hic-head">
+              <span id="hanami-index-title"><i class="fa-solid fa-compass"></i> 今日觀賞指數</span>
+              <span class="hanami-badge" id="hanami-score-badge">--</span>
+            </div>
+            <p class="hic-desc" id="hanami-advice-text">--</p>
+          </div>
+
+          <!-- 三日預報 -->
+          <div class="wp-forecast" id="weather-forecast">
+            <!-- 預報項目動態注入 -->
+          </div>
+        </div>
+
+        <!-- 簡潔說明與小撇步 -->
+        <div class="drawer-intro">
+          <h4><i class="fa-solid fa-align-left"></i> 景點簡介</h4>
+          <p id="drawer-desc">--</p>
+        </div>
+
+        <div class="drawer-tip-box">
+          <h4><i class="fa-solid fa-lightbulb"></i> 遊覽與交通建議</h4>
+          <p id="drawer-tips-text">--</p>
+        </div>
+
+        <!-- 操作按鈕 -->
+        <div class="drawer-buttons">
+          <a href="#" target="_blank" class="btn btn-outline" id="google-maps-btn">
+            <i class="fa-solid fa-diamond-turn-right"></i> Google 導航
+          </a>
+          <button class="btn btn-secondary" id="share-spot-btn">
+            <i class="fa-solid fa-share-nodes"></i> 分享景點
+          </button>
+          <button class="btn btn-primary" id="open-report-btn">
+            <i class="fa-solid fa-bullhorn"></i> 通報現況
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 彈窗 1：通報現況 -->
+  <div class="modal" id="report-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bullhorn"></i> 回報現場進度</h3>
+        <button class="close-modal-btn" data-modal="report-modal">&times;</button>
+      </div>
+      <form id="report-form" class="modal-body">
+        <input type="hidden" id="report-spot-id">
+        <p class="modal-spot-name">正在回報：<strong id="report-spot-title">--</strong></p>
+
+        <div class="form-group">
+          <label>現場狀態 <span class="required">*</span></label>
+          <div class="radio-status-group" id="report-radio-group">
+            <!-- 動態根據季節注入選項 -->
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reporter-name">通報暱稱</label>
+          <input type="text" id="reporter-name" placeholder="例如：旅人 (選填)" maxlength="20">
+        </div>
+
+        <div class="form-group">
+          <label for="report-note">現場觀察補充</label>
+          <textarea id="report-note" rows="2" placeholder="簡短描述當前花況、人潮或拍照建議..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-modal="report-modal">取消</button>
+          <button type="submit" class="btn btn-primary">提交更新</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 彈窗 2：分享連結 -->
+  <div class="modal" id="share-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-share-nodes"></i> 分享此景點</h3>
+        <button class="close-modal-btn" data-modal="share-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>複製直達地圖連結，分享給同行好友：</p>
+        <div class="share-link-box">
+          <input type="text" id="share-url-input" readonly>
+          <button class="btn btn-primary" id="copy-share-url-btn">
+            <i class="fa-regular fa-copy"></i> 複製
+          </button>
+        </div>
+        <div id="copy-feedback" class="copy-feedback">已複製到剪貼簿！</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 彈窗 3：AI 影像辨識預覽 -->
+  <div class="modal" id="ai-modal">
+    <div class="modal-dialog modal-large">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-wand-magic-sparkles"></i> AI 實景照片智能分析 (展示預覽)</h3>
+        <button class="close-modal-btn" data-modal="ai-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro">
+          模擬電腦視覺模型分析實地拍攝影像，自動識別成熟度比例與賞景建議。
+        </p>
+
+        <!-- 上傳本地檔案區塊 -->
+        <div class="ai-upload-bar">
+          <input type="file" id="ai-file-input" accept="image/*" style="display: none;">
+          <button type="button" class="btn btn-secondary btn-upload" id="trigger-upload-btn">
+            <i class="fa-solid fa-cloud-arrow-up"></i> 選擇您電腦中的照片辨識
+          </button>
+          <span class="ai-upload-note" id="ai-file-name-display">尚未選取檔案（支援 JPG, PNG, WebP）</span>
+        </div>
+
+        <div class="sample-picker">
+          <span>或快速測試範例：</span>
+          <button class="sample-chip active" data-img="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80">
+            🍁 大雪山紅葉
+          </button>
+          <button class="sample-chip" data-img="https://images.unsplash.com/photo-1522383225653-ed111181a951?auto=format&fit=crop&w=600&q=80">
+            🌸 目黑川櫻花
+          </button>
+          <button class="sample-chip" data-img="https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=600&q=80">
+            🌿 兼六園青葉
+          </button>
+          <button class="sample-chip chip-unrelated" data-img="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80">
+            💻 非景點相片 (電腦電路)
+          </button>
+        </div>
+
+        <div class="ai-preview-grid">
+          <div class="ai-image-box">
+            <img id="ai-target-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" alt="目標相片">
+          </div>
+          <div class="ai-result-panel">
+            <div class="ai-idle-message" id="ai-idle-msg">
+              <i class="fa-solid fa-camera-retro"></i>
+              <p>點選下方按鈕開始模擬 AI 分析</p>
+            </div>
+            <div class="ai-result-content" id="ai-result-content" style="display: none;">
+              <div class="ai-status-badge" id="ai-detected-status">見頃 (滿紅 95%)</div>
+              <div class="ai-metric-row">
+                <div class="ai-metric">
+                  <small>變色/開花比例</small>
+                  <strong id="ai-bloom-val">95%</strong>
+                </div>
+                <div class="ai-metric">
+                  <small>模型置信度</small>
+                  <strong id="ai-conf-val">98.2%</strong>
+                </div>
+              </div>
+              <div class="ai-advice">
+                <p id="ai-advice-p">--</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline" data-modal="ai-modal">關閉</button>
+          <button class="btn btn-primary" id="run-ai-btn">
+            <i class="fa-solid fa-bolt"></i> 執行 AI 辨識
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast 訊息元件 -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- 主前端程式邏輯 -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

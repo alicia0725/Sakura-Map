@@ -1,0 +1,12 @@
+.DS_Store
+.venv/
+__pycache__/
+*.pyc
+data/observations.sqlite3*
+data/raw/
+
+# Personal documents and local secrets
+output/
+.env
+.env.*
+!.env.example

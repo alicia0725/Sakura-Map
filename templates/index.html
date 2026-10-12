@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f6f7f2"><title>季見 · 日本花葉地圖</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+  <script src="{{ url_for('static',filename='js/app.js') }}" defer></script>
+</head>
+<body data-today="{{ today }}" data-season="{{ default_season }}">
+<header class="header"><a class="brand" href="/" aria-label="季見首頁"><span class="brand-mark">季</span><span>季見<small>KISETSU · JAPAN</small></span></a>
+  <nav class="seasons" aria-label="季節"><button id="sakura" data-season="sakura">櫻花</button><button id="momiji" data-season="momiji">紅葉</button></nav>
+  <button id="sources-button" class="text-button">資料與來源 ↗</button>
+</header>
+<div class="page">
+  <section class="intro"><div><p class="eyebrow">跟著季節，走進日本</p><h1 id="season-title">日本紅葉地圖</h1><p>拖動日期看區域變化，點選地區找景點與官方消息。</p></div><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="搜尋景點、城市或縣名" aria-label="搜尋所有景點"><button id="clear-search" hidden aria-label="清除搜尋">×</button></label></section>
+  <section class="timeline" aria-label="日期探索">
+    <div class="timeline-heading"><div class="date-group"><span class="eyebrow">旅行日期</span><input id="date-input" type="date" aria-label="選擇旅行日期"><select id="year" aria-label="年份"></select></div><button id="today" class="quiet-button">回到今天</button></div>
+    <div class="slider-row"><button id="previous-day" class="step" aria-label="前一天">‹</button><div class="slider-track"><input id="date-slider" type="range" min="0" max="364" step="1" aria-label="拖動旅行日期"><div class="month-labels"><span>1月</span><span>3月</span><span>5月</span><span>7月</span><span>9月</span><span>11月</span><span>12月</span></div></div><button id="next-day" class="step" aria-label="後一天">›</button></div>
+    <p class="timeline-note">日期只改變區域預估；景點實況保留原觀測日期。</p>
+  </section>
+  <main class="workspace">
+    <section class="map-panel" aria-labelledby="map-title">
+      <div class="panel-heading"><div><p class="eyebrow">日本分區導覽</p><h2 id="map-title">這一天，哪裡迎來季節？</h2></div><span id="estimate-type" class="pill">歷年基準</span></div>
+      <div id="legend" class="legend" aria-label="區域預估圖例"></div>
+      <div class="region-map" role="group" aria-label="日本九區示意圖"><span class="north">N ↑<small>北</small></span><span class="sea-label">日本海</span><span class="pacific">太平洋</span>
+        <button class="region hokkaido" data-region="hokkaido"><strong>北海道</strong><span class="region-stage">載入中</span><small class="region-count"></small></button>
+        <button class="region tohoku" data-region="tohoku"><strong>東北</strong><span class="region-stage">載入中</span><small class="region-count"></small></button>
+        <button class="region kanto" data-region="kanto"><strong>關東</strong><span class="region-stage">載入中</span><small class="region-count"></small></button>
+        <button class="region chubu" data-region="chubu"><strong>中部</strong><span class="region-stage">載入中</span><small class="region-count"></small></button>
+        <button class="region kansai" data-region="kansai"><strong>關西</strong><span class="region-stage">載入中</span><small class="region-count"></small></button>
+        <button class="region chugoku" data-region="chugoku"><strong>中國</strong><span class="region-stage">載入中</span><small class="region-count"></small></button>
+        <button class="region shikoku" data-region="shikoku"><strong>四國</strong><span class="region-stage">載入中</span><small class="region-count"></small></button>
+        <button class="region kyushu" data-region="kyushu"><strong>九州</strong><span class="region-stage">載入中</span><small class="region-count"></small></button>
+        <button class="region okinawa" data-region="okinawa"><strong>沖繩</strong><span class="region-stage">載入中</span><small class="region-count"></small></button>
+      </div>
+      <p class="map-caption">方位示意，非行政邊界・點選分區查看景點</p>
+      <p id="validation-note" class="fine-print"></p>
+      <section class="region-info" id="region-info" aria-live="polite"></section>
+    </section>
+    <section class="places-panel" aria-labelledby="list-title"><div class="list-views" aria-label="景點清單"><button id="region-view" type="button" aria-pressed="true">地區景點</button><button id="favorites-view" type="button" aria-pressed="false">♡ 我的收藏 <span id="favorites-count">0</span></button></div><p id="favorite-status" class="favorite-status" role="status" hidden></p><div class="list-heading"><div><p id="list-eyebrow" class="eyebrow">探索關東</p><h2 id="list-title">已收錄景點</h2></div><span id="list-count" class="count"></span></div>
+      <p class="list-note">近期官方紀錄優先，再列較舊紀錄與尚無紀錄的景點。</p><p id="load-status" role="status"></p><div id="places"></div>
+    </section>
+  </main>
+  <footer>季見 · 官方實況與區域預估分開呈現。收錄景點不代表每處都有即時資料。<span id="total-count"></span></footer>
+</div>
+<dialog id="sources-dialog"><div class="dialog-heading"><h2>資料與來源</h2><button id="close-sources" class="quiet-button" aria-label="關閉來源">關閉 ×</button></div><p>景點實況與見頃預測採官方公告；區域顏色是城市事件日期的估計，不能替代景點現況。</p><div id="source-list"></div><details><summary>模型與分區規則</summary><p>紅葉：綠色為區間下界14日前，黃色為其後至下界前，橘紅為區間內，褐色為區間後；灰色表示資料不足。褐色不等於已落葉。</p><p>同樹種至少15年、最多20年。天氣校正使用8–10月氣溫偏差與正則化線性模型。最近五年逐年回測至少100案例、平均誤差改善10%才啟用，否則使用歷年基準。</p><p>近期氣象採實際回傳預報範圍，更遠日期用歷年氣候情境。情境範圍不是校準信心區間。城市結果不涵蓋所有海拔。櫻花目前採滿開歷年基準。</p></details></dialog>
+</body></html>

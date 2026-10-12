@@ -1,0 +1,1232 @@
+/* ==========================================================================
+   Sakura & Momiji Map - 極簡清新日系設計風格
+   特點：無刺眼閃爍、資訊分明、高閱讀性、響應式
+   ========================================================================== */
+
+:root {
+  --primary: #c92a2a;
+  --primary-hover: #a61e1e;
+  --accent-full: #c92a2a;
+  --accent-half: #e8590c;
+  --accent-early: #f59f00;
+  --accent-bud: #2b8a3e;
+  --accent-fall: #862e9c;
+
+  --bg-body: #f8f9fa;
+  --card-bg: #ffffff;
+  --border-color: #e9ecef;
+  --border-active: #ced4da;
+
+  --text-main: #212529;
+  --text-muted: #6c757d;
+  --text-sub: #868e96;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --navbar-height: 56px;
+  --sidebar-width: 360px;
+  --drawer-width: 390px;
+}
+
+/* 春櫻主題變數覆寫 */
+body.theme-sakura {
+  --primary: #d81e5b;
+  --primary-hover: #b01548;
+  --accent-full: #d81e5b;
+  --accent-half: #f06595;
+  --accent-early: #f783ac;
+  --accent-bud: #2b8a3e;
+  --accent-fall: #ae3ec9;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Outfit', 'Noto Sans TC', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --------------------------------------------------------------------------
+   頂部導航列 (Navbar) - 極簡收斂
+   -------------------------------------------------------------------------- */
+.navbar {
+  height: var(--navbar-height);
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  z-index: 1000;
+  position: relative;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+}
+
+.brand-text h1 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* 季節切換膠囊按鈕 */
+.season-switcher {
+  display: flex;
+  background: #f1f3f5;
+  padding: 3px;
+  border-radius: var(--radius-full);
+  gap: 2px;
+}
+
+.season-btn {
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.season-btn.active {
+  background: #ffffff;
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.clock-badge {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.lang-box select {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.78rem;
+  background: #fff;
+  color: var(--text-main);
+  cursor: pointer;
+  outline: none;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: #f1f3f5;
+}
+
+.mobile-menu-btn {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   主排版區 (App Layout)
+   -------------------------------------------------------------------------- */
+.app-layout {
+  display: flex;
+  height: calc(100vh - var(--navbar-height));
+  position: relative;
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   左側景點欄 (Sidebar) - 簡潔無雜訊
+   -------------------------------------------------------------------------- */
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100%;
+  background: #ffffff;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  z-index: 500;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.03);
+  transition: transform 0.25s ease;
+}
+
+/* 搜尋框 */
+.search-container {
+  padding: 0.85rem 1rem 0.5rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 0.55rem 2rem 0.55rem 2.2rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  outline: none;
+  background: #f8f9fa;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.search-container input:focus {
+  border-color: var(--primary);
+  background: #ffffff;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1.65rem;
+  color: var(--text-sub);
+  font-size: 0.85rem;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 1.6rem;
+  background: #dee2e6;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #495057;
+  cursor: pointer;
+}
+
+/* 篩選標籤群 */
+.filter-group {
+  padding: 0.45rem 1rem;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.reset-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.region-pills,
+.status-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.pill,
+.status-btn {
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  font-size: 0.75rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.pill:hover,
+.status-btn:hover {
+  background: #f1f3f5;
+}
+
+.pill.active,
+.status-btn.active {
+  background: var(--text-main);
+  color: #ffffff;
+  border-color: var(--text-main);
+  font-weight: 600;
+}
+
+.color-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-full { background-color: var(--accent-full); }
+.dot-half { background-color: var(--accent-half); }
+.dot-early { background-color: var(--accent-early); }
+.dot-bud { background-color: var(--accent-bud); }
+.dot-fall { background-color: var(--accent-fall); }
+
+/* 景點清單列表 */
+.spots-list-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-top: 1px solid var(--border-color);
+  margin-top: 0.4rem;
+}
+
+.list-meta {
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: #fbfbfb;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.list-hint {
+  font-size: 0.7rem;
+  color: var(--text-sub);
+}
+
+.spots-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.spots-list::-webkit-scrollbar {
+  width: 5px;
+}
+.spots-list::-webkit-scrollbar-thumb {
+  background: #dee2e6;
+  border-radius: 4px;
+}
+
+/* 景點卡片 (簡約乾淨) */
+.spot-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.spot-card:hover {
+  border-color: #adb5bd;
+  background: #fdfdfd;
+}
+
+.spot-card.selected {
+  border-color: var(--primary);
+  background: #fff8f8;
+}
+
+.spot-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.spot-card-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.spot-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.spot-card-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+.spot-card-bar {
+  height: 3px;
+  background: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 0.4rem;
+}
+
+.spot-card-bar-fill {
+  height: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   地圖容器 (Map Area)
+   -------------------------------------------------------------------------- */
+.map-container {
+  flex: 1;
+  position: relative;
+  height: 100%;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  background: #e5e9ec;
+}
+
+/* 頂部季節情境條 */
+.season-notice-bar {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 450;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  font-size: 0.76rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* 右下角快速視角切換器 */
+.map-quick-views {
+  position: absolute;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 400;
+  display: flex;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.view-btn {
+  padding: 0.25rem 0.55rem;
+  background: transparent;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.view-btn:hover {
+  background: #f1f3f5;
+  color: var(--primary);
+}
+
+/* 左下角圖例 */
+.map-legend {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  z-index: 400;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.72rem;
+}
+
+.legend-title {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--text-main);
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+}
+
+.legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* 自訂圖釘 Marker (乾淨純色，無刺眼光暈動畫) */
+.custom-sakura-marker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.sakura-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background-color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+  border: 2px solid #ffffff;
+  transition: transform 0.15s ease;
+}
+
+.sakura-pin:hover {
+  transform: rotate(-45deg) scale(1.15);
+}
+
+.sakura-pin-icon {
+  transform: rotate(45deg);
+  font-size: 0.85rem;
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   景點詳情抽屜 (Spot Drawer) - 結構清晰
+   -------------------------------------------------------------------------- */
+.spot-drawer {
+  position: absolute;
+  top: 0;
+  right: -420px;
+  width: var(--drawer-width);
+  height: 100%;
+  background: #ffffff;
+  box-shadow: -3px 0 16px rgba(0, 0, 0, 0.08);
+  z-index: 600;
+  overflow-y: auto;
+  transition: right 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.spot-drawer.open {
+  right: 0;
+}
+
+.close-drawer-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawer-cover {
+  position: relative;
+  height: 180px;
+  background: #eee;
+}
+
+.drawer-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.drawer-cover-badge {
+  position: absolute;
+  bottom: 0.65rem;
+  left: 0.85rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.76rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.drawer-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.drawer-heading h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.drawer-subnames {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.drawer-address {
+  font-size: 0.76rem;
+  color: var(--text-sub);
+  margin-top: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.drawer-progress-box {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+}
+
+.dp-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.dp-bar {
+  height: 6px;
+  background: #e9ecef;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.dp-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+}
+
+.dp-period {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.drawer-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.spec-cell {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  padding: 0.55rem;
+  border-radius: var(--radius-sm);
+}
+
+.spec-cell small {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.spec-cell p {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-top: 0.1rem;
+}
+
+/* 天氣面板 (Weather Panel) */
+.weather-panel {
+  background: #fdfdfd;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+}
+
+.wp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.wp-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.live-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2b8a3e;
+  display: inline-block;
+}
+
+.btn-refresh {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+}
+
+.btn-refresh:hover {
+  background: #f1f3f5;
+  color: var(--text-main);
+}
+
+.wp-coords {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-sub);
+  margin: 0.35rem 0 0.6rem;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 0.35rem;
+}
+
+.wp-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.wp-temp {
+  display: flex;
+  align-items: flex-start;
+}
+
+.temp-num {
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-main);
+}
+
+.temp-deg {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.wp-cond {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 0.2rem;
+}
+
+.wp-metrics {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* 觀賞指數卡片 */
+.hanami-index-card {
+  background: #f8f9fa;
+  border-left: 3px solid var(--primary);
+  padding: 0.45rem 0.65rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-bottom: 0.65rem;
+}
+
+.hic-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.hanami-badge {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-full);
+  background: #e6fcf5;
+  color: #0ca678;
+}
+
+.hic-desc {
+  font-size: 0.72rem;
+  color: #495057;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.wp-forecast {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}
+
+.forecast-item {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  padding: 0.35rem;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 0.72rem;
+}
+
+.f-date {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.f-temp {
+  color: #e8590c;
+  font-weight: 600;
+}
+
+/* 簡短介紹與技巧 */
+.drawer-intro h4,
+.drawer-tip-box h4 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.drawer-intro p {
+  font-size: 0.78rem;
+  color: #495057;
+  line-height: 1.5;
+}
+
+.drawer-tip-box {
+  background: #fff9db;
+  border-left: 3px solid #fcc419;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.drawer-tip-box p {
+  font-size: 0.75rem;
+  color: #495057;
+  line-height: 1.4;
+}
+
+.drawer-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   按鈕 (Buttons)
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: #e9ecef;
+  color: #495057;
+}
+.btn-secondary:hover {
+  background: #dee2e6;
+}
+
+.btn-outline {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  color: #495057;
+}
+.btn-outline:hover {
+  border-color: #adb5bd;
+  color: #212529;
+}
+
+/* --------------------------------------------------------------------------
+   彈窗 (Modals)
+   -------------------------------------------------------------------------- */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-dialog {
+  background: #fff;
+  width: 100%;
+  max-width: 440px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.modal-large {
+  max-width: 580px;
+}
+
+.modal-header {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.close-modal-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 1rem;
+}
+
+.form-group {
+  margin-bottom: 0.75rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--primary);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.radio-status-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.radio-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.radio-row:hover {
+  background: #f8f9fa;
+}
+
+.share-link-box {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+
+.share-link-box input {
+  flex: 1;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  background: #f8f9fa;
+}
+
+.copy-feedback {
+  font-size: 0.75rem;
+  color: #2b8a3e;
+  display: none;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #212529;
+  color: #fff;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  box-shadow: var(--shadow-md);
+  z-index: 3000;
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   響應式斷點 (Responsive)
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .mobile-menu-btn {
+    display: flex;
+  }
+  .clock-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    width: 100%;
+  }
+  .spot-drawer {
+    width: 100%;
+    height: 70vh;
+    top: auto;
+    bottom: -100%;
+    right: 0;
+    transition: bottom 0.25s ease;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+  .spot-drawer.open {
+    bottom: 0;
+    right: 0;
+  }
+  .season-notice-bar {
+    display: none;
+  }
+  .map-legend {
+    display: none;
+  }
+}
+
+/* 即時氣象強化標籤樣式 */
+.wp-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wp-live-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: #e6fcf5;
+  color: #0ca678;
+  border: 1px solid rgba(12, 166, 120, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.wp-sub-metrics {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+/* AI 上傳按鈕與非景點警告卡片 */
+.ai-upload-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f8f9fa;
+  border: 1px dashed var(--border-active);
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+}
+
+.btn-upload {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.ai-upload-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.chip-unrelated {
+  border-color: #adb5bd !important;
+  color: #495057 !important;
+}
+
+.ai-warning-box {
+  background: #fff5f5;
+  border: 1px solid #ffc9c9;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.ai-warning-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #c92a2a;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.ai-warning-desc {
+  font-size: 0.76rem;
+  color: #495057;
+  line-height: 1.5;
+  margin: 0;
+}
